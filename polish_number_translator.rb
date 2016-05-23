@@ -1,13 +1,16 @@
 # encoding: UTF-8
 class PolishNumberTranslator
+  def self.hello
+    puts ""
+  end
 
-  def translate(number)
+  def self.translate(number)
     initialize
     map_translation(number)
     # def translate
   end
   private
-  def initialize
+  def self.initialize
     @@cardinal_numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     @@cardinal_numbers_mapping = {
       '0' => 'zero',
@@ -62,10 +65,18 @@ class PolishNumberTranslator
       '5,6,7,8,9' => 'milionów',
       '0' => 'milionów'
     }
+    @@miliard = '1000000000'
+    @@miliard_mapping = {
+      '1' => 'miliard',
+      '2,3,4' => 'miliardy',
+      '5,6,7,8,9' => 'miliardów',
+      '0' => 'miliardów'
+    }
+
     # def initialize
   end
 
-  def map_translation(number)
+  def self.map_translation(number)
     output = []
     case number.length
     when 1
@@ -130,18 +141,36 @@ class PolishNumberTranslator
         output << @@milion_mapping['0']
       end
       output << map_translation(number[-6,6]) if number[-6,6] != '000000'
-    # when 10
-    # when 11
-    # when 12
-    # when 13
-    # when 14
-    # when 15
+    when 10
+      if number[0] == '1'
+        output << @@miliard_mapping['1']
+      else
+        output << map_translation(number[0])
+        @@miliard_mapping.each{|key,value| output << value if key.include?(number[0])}
+      end
+      output << map_translation(number[1,9]) if number[1,9] != '000000000'
+    when 11
+      output << map_translation(number[0,2])
+      if number[0] != '1'
+        @@miliard_mapping.each {|key,value| output << value if key.include?(number[1])}
+      else
+        output << @@miliard_mapping['0']
+      end
+      output << map_translation(number[2,9]) if number[2,9] != '000000000'
+    when 12
+      output << map_translation(number[0,3])
+      if number[1] != '1'
+        @@miliard_mapping.each {|key,value| output << value if key.include?(number[1])}
+      else
+        output << @@miliard_mapping['0']
+      end
+      output << map_translation(number[-9,9]) if number[-9,9] != '000000000'
     end
     return output.join(" ").strip
     # def map_translation
   end
 
-  def numbers_between10_and_20(number)
+  def self.numbers_between10_and_20(number)
     case number[1]
     when '1'
       @@cardinal_numbers_mapping[number[1]] + "aście"
